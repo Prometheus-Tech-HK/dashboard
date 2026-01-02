@@ -3,8 +3,11 @@ FROM oven/bun:latest AS base
 WORKDIR /app
 
 # Install dependencies
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+COPY package.json ./
+# Use public registry in case the lockfile is polluted with private ones
+RUN echo "registry=https://registry.npmjs.org/" > .npmrc
+RUN bun install
+
 
 # Copy prisma schema and generate client
 COPY prisma ./prisma

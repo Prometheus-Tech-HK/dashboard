@@ -59,7 +59,7 @@ export const fetchTransactions = async (filters: { month?: string; category?: st
     params.append('projectId', filters.projectId);
   }
 
-  const response = await fetch(`/transactions?${params.toString()}`);
+  const response = await fetch(`/api/transactions?${params.toString()}`);
   if (!response.ok) {
     throw new Error('Failed to fetch transactions');
   }
@@ -84,7 +84,7 @@ export const fetchTransactions = async (filters: { month?: string; category?: st
 };
 
 export const fetchProjects = async (): Promise<Project[]> => {
-  const response = await fetch('/projects');
+  const response = await fetch('/api/projects');
   if (!response.ok) {
     throw new Error('Failed to fetch projects');
   }
@@ -93,7 +93,7 @@ export const fetchProjects = async (): Promise<Project[]> => {
 };
 
 export const fetchCategories = async (): Promise<string[]> => {
-  const response = await fetch('/categories');
+  const response = await fetch('/api/categories');
   if (!response.ok) {
     throw new Error('Failed to fetch categories');
   }
@@ -102,7 +102,7 @@ export const fetchCategories = async (): Promise<string[]> => {
 };
 
 export const fetchMonths = async (): Promise<string[]> => {
-  const response = await fetch('/months');
+  const response = await fetch('/api/months');
   if (!response.ok) {
     throw new Error('Failed to fetch months');
   }

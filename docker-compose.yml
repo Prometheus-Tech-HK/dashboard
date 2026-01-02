@@ -8,22 +8,15 @@ services:
     environment:
       - PORT=3000
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/dashboard?schema=public}
+    ports:
+      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
     networks:
       - app-network
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-    networks:
-      - app-network
+    volumes:
+      - ./csv:/app/csv
 
   db:
     image: postgres:15-alpine
