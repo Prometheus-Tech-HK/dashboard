@@ -9,9 +9,22 @@ import { ErrorDisplay } from './components/ErrorDisplay';
 import { useTransactions, useCategories, useMonths, useProjects } from './hooks/useDashboardData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
-import { LayoutDashboard, ReceiptText } from 'lucide-react';
+import { LayoutDashboard, ReceiptText, LogOut, User as UserIcon } from 'lucide-react';
+import { useAuth } from './hooks/useAuth';
+import { LoginPage } from './components/LoginPage';
+import { UserManagement } from './components/UserManagement';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./components/ui/dropdown-menu"
+import { Button } from "./components/ui/button"
 
 export default function App() {
+  const { user, isLoading: isAuthLoading, logout } = useAuth();
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<string>('all');
@@ -61,6 +74,21 @@ export default function App() {
     refetchProjects();
   };
 
+  if (isAuthLoading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <div className="flex flex-col items-center gap-4">
+          <Loader size={48} className="text-blue-500" />
+          <div className="text-xl">Checking authentication...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
   const isLoadingInitial = (categoriesLoading || monthsLoading || projectsLoading) && categories.length === 1 && months.length === 1 && projects.length === 0;
   const hasError = (transactionsError || categoriesError || monthsError || projectsError) && transactions.length === 0;
 
@@ -101,7 +129,7 @@ export default function App() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <LayoutDashboard className="w-6 h-6 text-white" />
+                <img src="logo.png" alt="" />
               </div>
               <h1 className={`text-3xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Prometheus Tech <span className="text-blue-600">Finance</span>
@@ -113,6 +141,27 @@ export default function App() {
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="rounded-full bg-white/20 backdrop-blur-md border-white/20">
+                  <UserIcon className={`h-5 w-5 ${isDarkMode ? 'text-white' : 'text-gray-700'}`} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-white/20 dark:border-white/10">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="cursor-pointer">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>{user.username}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout} className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/20">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -140,6 +189,12 @@ export default function App() {
                 <ReceiptText />
                 Transactions
               </TabsTrigger>
+              {user.role === 'admin' && (
+                <TabsTrigger value="users">
+                  <UserIcon className="w-4 h-4 mr-2" />
+                  Users
+                </TabsTrigger>
+              )}
             </TabsList>
 
             {/* Global Filters Integration */}
@@ -220,6 +275,12 @@ export default function App() {
                 isDarkMode={isDarkMode}
                 isLoading={isTransactionsFetching}
               />
+            )}
+          </TabsContent>
+
+          <TabsContent value="users" className="mt-0">
+            {activeTab === 'users' && user.role === 'admin' && (
+              <UserManagement />
             )}
           </TabsContent>
         </Tabs>
