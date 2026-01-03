@@ -61,10 +61,7 @@
       open: true,
       allowedHosts: ['.ngrok-free.app', 'localhost'],
       proxy: {
-        '/transactions': 'http://localhost:3000',
-        '/categories': 'http://localhost:3000',
-        '/months': 'http://localhost:3000',
-        '/projects': 'http://localhost:3000',
+        '/api': 'http://localhost:3000',
       },
     },
   });
