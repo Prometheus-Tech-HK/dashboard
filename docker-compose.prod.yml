@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: dawnseeker8/dashboard-backend:1.0.0
+    image: dawnseeker8/dashboard-backend:1.0.1
     environment:
       - PORT=3000
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/dashboard?schema=public}
